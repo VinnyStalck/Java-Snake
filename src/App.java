@@ -8,7 +8,7 @@ public class App {
 		GamePanel gamePanel = new GamePanel();
 
 		frame.setBounds(10, 10, 905, 700);
-		frame.setBackground(Color.WHITE);
+		frame.setBackground(Color.WHITE );
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
