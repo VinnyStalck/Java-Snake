@@ -10,7 +10,6 @@ public class App {
 		JFrame frame = new JFrame();
 		GamePanel gamePanel = new GamePanel();
 
-
 		frame.setBounds(10, 10, frameWidth, frameHeight);
 		frame.setBackground(Color.WHITE );
 		frame.setResizable(false);

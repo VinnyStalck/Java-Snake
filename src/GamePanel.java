@@ -46,6 +46,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	public void paint(Graphics g) {
+		// displayTitle(g);
+		
+		displayGame(g, 0);
+
 		if (moves == 0) {
 			snake.setXLength(0, gameXPos + tileSize * 4);
 			snake.setXLength(1, gameXPos + tileSize * 3);
@@ -53,20 +57,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 			snake.setYLength(0, gameYPos + tileSize * 4);
 			snake.setYLength(1, gameYPos + tileSize * 4);
 			snake.setYLength(2, gameYPos + tileSize * 4);
+
+			snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
+			snake.getHeadFacingRight().paintIcon(this, g, snake.getXLength()[0], snake.getYLength()[0]);
 		}
-
-		displayTitle(g);
-
-		// Display game panel border
-		g.setColor(Color.WHITE);
-		g.drawRect(gameXPos - 1, gameYPos - 1, gameWidth + 1, gameHeight + 2);
-
-		// Displays game panel background
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(gameXPos, gameYPos, gameWidth, gameHeight);
-
-		snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
-		snake.getHeadFacingRight().paintIcon(this, g, snake.getXLength()[0], snake.getYLength()[0]);
 
 		for (int i = 0; i < snake.getLength(); i++) {
 			if (i == 0 && snake.isFacingRight()) {
@@ -91,26 +85,47 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 				snake.getTail().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
 
-			/*
-			 * Fruit
-			 */
-			fruit.setIcon(new ImageIcon(assets("fruit")));
-			// If the head of the snake is on the same tile of the fruit
-			if (fruit.getTile().getXPos() == snake.getXLength()[0]
-					&& fruit.getTile().getYPos() == snake.getYLength()[0]) {
-				score++;
-				snake.grow();
-				fruit.place(grid);
-			}
-			fruit.getIcon().paintIcon(this, g, fruit.getTile().getXPos(), fruit.getTile().getYPos());
 		}
+		displayFruit(g);
 
 		g.dispose();
 	}
 
 	/**
+	 * Displays game panel border and background
+	 * @param g
+	 * @param border Border thickness
+	 */
+	private void displayGame(Graphics g, int border) {
+		if (border > 0) {
+			// Display game panel border
+			g.setColor(Color.WHITE);
+			g.drawRect(gameXPos - border, gameYPos - border, gameWidth + border, gameHeight + border);
+		}
+
+		// Displays game panel background
+		g.setColor(Color.DARK_GRAY);
+		g.fillRect(gameXPos, gameYPos, gameWidth, gameHeight);
+	}
+
+	/**
+	 * Displays fruit
+	 * @param g
+	 */
+	private void displayFruit(Graphics g) {
+		fruit.setIcon(new ImageIcon(assets("fruit")));
+		// If the head of the snake is on the same tile of the fruit
+		if (fruit.getTile().getXPos() == snake.getXLength()[0]
+				&& fruit.getTile().getYPos() == snake.getYLength()[0]) {
+			score++;
+			snake.grow();
+			fruit.place(grid);
+		}
+		fruit.getIcon().paintIcon(this, g, fruit.getTile().getXPos(), fruit.getTile().getYPos());
+	}
+
+	/**
 	 * Displays title
-	 * 
 	 * @param g
 	 */
 	private void displayTitle(Graphics g) {
