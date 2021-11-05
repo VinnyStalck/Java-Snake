@@ -21,8 +21,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 	private static final int gameWidth = tileSize * xTiles;
 	private static final int gameHeight = tileSize * yTiles;
-	private static final int gameXPos = 25;
-	private static final int gameYPos = 75;
+	private static final int gameXPos = ((App.frameWidth - gameWidth) / 2) - 8;
+	private static final int gameYPos = ((App.frameHeight - gameHeight) / 2);
 
 	private ImageIcon titleImage;
 
@@ -158,7 +158,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 				// Moves snake to the other side of the screen
 				if (snake.getXLength()[i] < gameXPos) {
-					snake.setXLength(i, gameWidth);
+					snake.setXLength(i, gameXPos + gameWidth - tileSize);
 				}
 			}
 			repaint();
@@ -177,7 +177,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 				// Moves snake to the other side of the screen
 				if (snake.getYLength()[i] < gameYPos) {
-					snake.setYLength(i, gameYPos + gameHeight);
+					snake.setYLength(i, gameYPos + gameHeight - tileSize);
 				}
 			}
 			repaint();
