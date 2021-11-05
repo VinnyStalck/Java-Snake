@@ -23,6 +23,10 @@ public class Snake {
 		
 	}
 
+	public void grow() {
+		length++;
+	}
+
 	public int[] getXLength() {
 		return xLength;
 	}

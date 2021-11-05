@@ -1,24 +1,28 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import objects.Fruit;
+import objects.Grid;
 import objects.Snake;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.KeyListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
-	private static final int backgroundXPos = 25;
-	private static final int backgroundYPos = 75;
-	private static final int backgroundWidth = 850;
-	private static final int backgroundHeight = 575;
-
 	private static final int tileSize = 25;
+	private static final int xTiles = 34;
+	private static final int yTiles = 23;
+
+	private static final int gameWidth = tileSize * xTiles;
+	private static final int gameHeight = tileSize * yTiles;
+	private static final int gameXPos = 25;
+	private static final int gameYPos = 75;
 
 	private ImageIcon titleImage;
 
@@ -28,7 +32,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	private int moves = 0;
 	private int score = 0;
 
+	Grid grid = new Grid(tileSize, gameXPos, gameYPos, gameWidth, gameHeight);
 	Snake snake = new Snake();
+	Fruit fruit = new Fruit(grid);
 
 	public GamePanel() {
 		addKeyListener(this);
@@ -41,66 +47,79 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 	public void paint(Graphics g) {
 		if (moves == 0) {
-			snake.setXLength(0, 100);
-			snake.setXLength(1, 75);
-			snake.setXLength(2, 50);
-			snake.setYLength(0, 100);
-			snake.setYLength(1, 100);
-			snake.setYLength(2, 100);
+			snake.setXLength(0, gameXPos + tileSize * 4);
+			snake.setXLength(1, gameXPos + tileSize * 3);
+			snake.setXLength(2, gameXPos + tileSize * 2);
+			snake.setYLength(0, gameYPos + tileSize * 4);
+			snake.setYLength(1, gameYPos + tileSize * 4);
+			snake.setYLength(2, gameYPos + tileSize * 4);
 		}
-		
+
 		displayTitle(g);
 
 		// Display game panel border
 		g.setColor(Color.WHITE);
-		g.drawRect(backgroundXPos-1, backgroundYPos-1, backgroundWidth+1, backgroundHeight+2);
+		g.drawRect(gameXPos - 1, gameYPos - 1, gameWidth + 1, gameHeight + 2);
 
 		// Displays game panel background
 		g.setColor(Color.DARK_GRAY);
-		g.fillRect(backgroundXPos, backgroundYPos, backgroundWidth, backgroundHeight);
+		g.fillRect(gameXPos, gameYPos, gameWidth, gameHeight);
 
-		
 		snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
 		snake.getHeadFacingRight().paintIcon(this, g, snake.getXLength()[0], snake.getYLength()[0]);
-		
+
 		for (int i = 0; i < snake.getLength(); i++) {
-			if (i==0 && snake.isFacingRight()) {
+			if (i == 0 && snake.isFacingRight()) {
 				snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
 				snake.getHeadFacingRight().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
-			if (i==0 && snake.isFacingLeft()) {
+			if (i == 0 && snake.isFacingLeft()) {
 				snake.setHeadFacingLeft(new ImageIcon(assets("snake_head_left")));
 				snake.getHeadFacingLeft().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
-			if (i==0 && snake.isFacingUp()) {
+			if (i == 0 && snake.isFacingUp()) {
 				snake.setHeadFacingUp(new ImageIcon(assets("snake_head_up")));
 				snake.getHeadFacingUp().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
-			if (i==0 && snake.isFacingDown()) {
+			if (i == 0 && snake.isFacingDown()) {
 				snake.setHeadFacingDown(new ImageIcon(assets("snake_head_down")));
 				snake.getHeadFacingDown().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
 
-			if (i!=0) {
+			if (i != 0) {
 				snake.setTail(new ImageIcon(assets("snake_tail")));
 				snake.getTail().paintIcon(this, g, snake.getXLength()[i], snake.getYLength()[i]);
 			}
+
+			/*
+			 * Fruit
+			 */
+			fruit.setIcon(new ImageIcon(assets("fruit")));
+			// If the head of the snake is on the same tile of the fruit
+			if (fruit.getTile().getXPos() == snake.getXLength()[0]
+					&& fruit.getTile().getYPos() == snake.getYLength()[0]) {
+				score++;
+				snake.grow();
+				fruit.place(grid);
+			}
+			fruit.getIcon().paintIcon(this, g, fruit.getTile().getXPos(), fruit.getTile().getYPos());
 		}
-		
+
 		g.dispose();
 	}
 
 	/**
 	 * Displays title
+	 * 
 	 * @param g
 	 */
 	private void displayTitle(Graphics g) {
 		titleImage = new ImageIcon(assets("snake_head"));
-		titleImage.paintIcon(this, g, tileSize, 5);
+		titleImage.paintIcon(this, g, gameXPos, 5);
 	}
 
 	private String assets(String assetName) {
-		return "src/assets/"+assetName+".png";
+		return "src/assets/" + assetName + ".png";
 	}
 
 	@Override
@@ -108,87 +127,87 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		timer.restart();
 		if (snake.isFacingRight()) {
 			// Next position of the snake becomes the previous one
-			for (int i = snake.getLength()-1; i >= 0; i--) {
-				snake.setYLength(i+1, snake.getYLength()[i]);
+			for (int i = snake.getLength() - 1; i >= 0; i--) {
+				snake.setYLength(i + 1, snake.getYLength()[i]);
 			}
 			for (int i = snake.getLength(); i >= 0; i--) {
-				if (i==0) {
-					snake.setXLength(i, snake.getXLength()[i]+backgroundXPos);
+				if (i == 0) {
+					snake.setXLength(i, snake.getXLength()[i] + tileSize);
 				} else {
-					snake.setXLength(i, snake.getXLength()[i-1]);
+					snake.setXLength(i, snake.getXLength()[i - 1]);
 				}
 
 				// Moves snake to the other side of the screen
-				if (snake.getXLength()[i] > backgroundWidth) {
-					snake.setXLength(i, backgroundXPos);
+				if (snake.getXLength()[i] > gameWidth) {
+					snake.setXLength(i, gameXPos);
 				}
 			}
 			repaint();
 		}
 		if (snake.isFacingLeft()) {
 			// Next position of the snake becomes the previous one
-			for (int i = snake.getLength()-1; i >= 0; i--) {
-				snake.setYLength(i+1, snake.getYLength()[i]);
+			for (int i = snake.getLength() - 1; i >= 0; i--) {
+				snake.setYLength(i + 1, snake.getYLength()[i]);
 			}
 			for (int i = snake.getLength(); i >= 0; i--) {
-				if (i==0) {
-					snake.setXLength(i, snake.getXLength()[i]-backgroundXPos);
+				if (i == 0) {
+					snake.setXLength(i, snake.getXLength()[i] - tileSize);
 				} else {
-					snake.setXLength(i, snake.getXLength()[i-1]);
+					snake.setXLength(i, snake.getXLength()[i - 1]);
 				}
 
 				// Moves snake to the other side of the screen
-				if (snake.getXLength()[i] < backgroundXPos) {
-					snake.setXLength(i, backgroundWidth);
+				if (snake.getXLength()[i] < gameXPos) {
+					snake.setXLength(i, gameWidth);
 				}
 			}
 			repaint();
 		}
 		if (snake.isFacingUp()) {
 			// Next position of the snake becomes the previous one
-			for (int i = snake.getLength()-1; i >= 0; i--) {
-				snake.setXLength(i+1, snake.getXLength()[i]);
+			for (int i = snake.getLength() - 1; i >= 0; i--) {
+				snake.setXLength(i + 1, snake.getXLength()[i]);
 			}
 			for (int i = snake.getLength(); i >= 0; i--) {
-				if (i==0) {
-					snake.setYLength(i, snake.getYLength()[i]-backgroundXPos);
+				if (i == 0) {
+					snake.setYLength(i, snake.getYLength()[i] - tileSize);
 				} else {
-					snake.setYLength(i, snake.getYLength()[i-1]);
+					snake.setYLength(i, snake.getYLength()[i - 1]);
 				}
 
 				// Moves snake to the other side of the screen
-				if (snake.getYLength()[i] < backgroundYPos) {
-					snake.setYLength(i, backgroundYPos+backgroundHeight-tileSize);
+				if (snake.getYLength()[i] < gameYPos) {
+					snake.setYLength(i, gameYPos + gameHeight);
 				}
 			}
 			repaint();
 		}
 		if (snake.isFacingDown()) {
 			// Next position of the snake becomes the previous one
-			for (int i = snake.getLength()-1; i >= 0; i--) {
-				snake.setXLength(i+1, snake.getXLength()[i]);
+			for (int i = snake.getLength() - 1; i >= 0; i--) {
+				snake.setXLength(i + 1, snake.getXLength()[i]);
 			}
 			for (int i = snake.getLength(); i >= 0; i--) {
-				if (i==0) {
-					snake.setYLength(i, snake.getYLength()[i]+backgroundXPos);
+				if (i == 0) {
+					snake.setYLength(i, snake.getYLength()[i] + tileSize);
 				} else {
-					snake.setYLength(i, snake.getYLength()[i-1]);
+					snake.setYLength(i, snake.getYLength()[i - 1]);
 				}
 
 				// Moves snake to the other side of the screen
-				if (snake.getYLength()[i] > backgroundYPos+backgroundHeight-tileSize) {
-					snake.setYLength(i, backgroundYPos);
+				if (snake.getYLength()[i] > gameYPos + gameHeight - tileSize) {
+					snake.setYLength(i, gameYPos);
 				}
 			}
 			repaint();
 		}
-		
+
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -236,6 +255,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
