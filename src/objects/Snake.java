@@ -91,33 +91,42 @@ public class Snake {
 		return isFacingRight;
 	}
 
-	public void setFacingRight(boolean isFacingRight) {
-		this.isFacingRight = isFacingRight;
+	public void setFacingRight() {
+		resetFacing();
+		isFacingRight = true;
 	}
 
 	public boolean isFacingLeft() {
 		return isFacingLeft;
 	}
 
-	public void setFacingLeft(boolean isFacingLeft) {
-		this.isFacingLeft = isFacingLeft;
+	public void setFacingLeft() {
+		resetFacing();
+		isFacingLeft = true;
 	}
 
 	public boolean isFacingUp() {
 		return isFacingUp;
 	}
 
-	public void setFacingUp(boolean isFacingUp) {
-		this.isFacingUp = isFacingUp;
+	public void setFacingUp() {
+		resetFacing();
+		isFacingUp = true;
 	}
 
 	public boolean isFacingDown() {
 		return isFacingDown;
 	}
 
-	public void setFacingDown(boolean isFacingDown) {
-		this.isFacingDown = isFacingDown;
+	public void setFacingDown() {
+		resetFacing();
+		isFacingDown = true;
 	}
 
-	
+	private void resetFacing() {
+		isFacingRight = false;
+		isFacingLeft = false;
+		isFacingUp = false;
+		isFacingDown = false;
+	}
 }

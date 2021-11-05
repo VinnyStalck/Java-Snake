@@ -12,6 +12,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
+
+	private static final int backgroundXPos = 25;
+	private static final int backgroundYPos = 75;
+	private static final int backgroundWidth = 850;
+	private static final int backgroundHeight = 575;
+
+	private static final int tileSize = 25;
+
 	private ImageIcon titleImage;
 
 	private Timer timer;
@@ -45,11 +53,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 		// Display game panel border
 		g.setColor(Color.WHITE);
-		g.drawRect(24, 74, 851, 577);
+		g.drawRect(backgroundXPos-1, backgroundYPos-1, backgroundWidth+1, backgroundHeight+2);
 
 		// Displays game panel background
 		g.setColor(Color.DARK_GRAY);
-		g.fillRect(25, 75, 850, 575);
+		g.fillRect(backgroundXPos, backgroundYPos, backgroundWidth, backgroundHeight);
 
 		
 		snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
@@ -88,7 +96,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	 */
 	private void displayTitle(Graphics g) {
 		titleImage = new ImageIcon(assets("snake_head"));
-		titleImage.paintIcon(this, g, 25, 5);
+		titleImage.paintIcon(this, g, tileSize, 5);
 	}
 
 	private String assets(String assetName) {
@@ -97,7 +105,83 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		timer.restart();
+		if (snake.isFacingRight()) {
+			// Next position of the snake becomes the previous one
+			for (int i = snake.getLength()-1; i >= 0; i--) {
+				snake.setYLength(i+1, snake.getYLength()[i]);
+			}
+			for (int i = snake.getLength(); i >= 0; i--) {
+				if (i==0) {
+					snake.setXLength(i, snake.getXLength()[i]+backgroundXPos);
+				} else {
+					snake.setXLength(i, snake.getXLength()[i-1]);
+				}
+
+				// Moves snake to the other side of the screen
+				if (snake.getXLength()[i] > backgroundWidth) {
+					snake.setXLength(i, backgroundXPos);
+				}
+			}
+			repaint();
+		}
+		if (snake.isFacingLeft()) {
+			// Next position of the snake becomes the previous one
+			for (int i = snake.getLength()-1; i >= 0; i--) {
+				snake.setYLength(i+1, snake.getYLength()[i]);
+			}
+			for (int i = snake.getLength(); i >= 0; i--) {
+				if (i==0) {
+					snake.setXLength(i, snake.getXLength()[i]-backgroundXPos);
+				} else {
+					snake.setXLength(i, snake.getXLength()[i-1]);
+				}
+
+				// Moves snake to the other side of the screen
+				if (snake.getXLength()[i] < backgroundXPos) {
+					snake.setXLength(i, backgroundWidth);
+				}
+			}
+			repaint();
+		}
+		if (snake.isFacingUp()) {
+			// Next position of the snake becomes the previous one
+			for (int i = snake.getLength()-1; i >= 0; i--) {
+				snake.setXLength(i+1, snake.getXLength()[i]);
+			}
+			for (int i = snake.getLength(); i >= 0; i--) {
+				if (i==0) {
+					snake.setYLength(i, snake.getYLength()[i]-backgroundXPos);
+				} else {
+					snake.setYLength(i, snake.getYLength()[i-1]);
+				}
+
+				// Moves snake to the other side of the screen
+				if (snake.getYLength()[i] < backgroundYPos) {
+					snake.setYLength(i, backgroundYPos+backgroundHeight-tileSize);
+				}
+			}
+			repaint();
+		}
+		if (snake.isFacingDown()) {
+			// Next position of the snake becomes the previous one
+			for (int i = snake.getLength()-1; i >= 0; i--) {
+				snake.setXLength(i+1, snake.getXLength()[i]);
+			}
+			for (int i = snake.getLength(); i >= 0; i--) {
+				if (i==0) {
+					snake.setYLength(i, snake.getYLength()[i]+backgroundXPos);
+				} else {
+					snake.setYLength(i, snake.getYLength()[i-1]);
+				}
+
+				// Moves snake to the other side of the screen
+				if (snake.getYLength()[i] > backgroundYPos+backgroundHeight-tileSize) {
+					snake.setYLength(i, backgroundYPos);
+				}
+			}
+			repaint();
+		}
 		
 	}
 
@@ -109,8 +193,44 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			moves++;
+
+			if (!snake.isFacingLeft()) {
+				snake.setFacingRight();
+			} else {
+				snake.setFacingLeft();
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			moves++;
+
+			if (!snake.isFacingRight()) {
+				snake.setFacingLeft();
+			} else {
+				snake.setFacingRight();
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			moves++;
+
+			if (!snake.isFacingDown()) {
+				snake.setFacingUp();
+			} else {
+				snake.setFacingDown();
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			moves++;
+
+			if (!snake.isFacingUp()) {
+				snake.setFacingDown();
+			} else {
+				snake.setFacingUp();
+			}
+		}
+
 	}
 
 	@Override
