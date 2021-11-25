@@ -127,7 +127,7 @@ public class Snake {
 		isFacingDown = true;
 	}
 
-	private void resetFacing() {
+	public void resetFacing() {
 		isFacingRight = false;
 		isFacingLeft = false;
 		isFacingUp = false;

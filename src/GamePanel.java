@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,8 +25,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	private static final int gameXPos = ((App.frameWidth - gameWidth) / 2) - 8;
 	private static final int gameYPos = ((App.frameHeight - gameHeight) / 2);
 
-	private ImageIcon titleImage;
-
 	private Timer timer;
 	private int delay = 100;
 
@@ -46,7 +45,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	public void paint(Graphics g) {
-		// displayTitle(g);
+		displayTitle(g);
 		
 		displayGame(g, 0);
 
@@ -62,6 +61,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 			snake.getHeadFacingRight().paintIcon(this, g, snake.getXLength()[0], snake.getYLength()[0]);
 		}
 
+		// Display score and length
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("areal", Font.PLAIN, 14));
+		g.drawString("Score: "+score, 780, 30);
+
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("areal", Font.PLAIN, 14));
+		g.drawString("Length: "+snake.getLength(), 780, 50);
+
+		// Display head in initial position
 		for (int i = 0; i < snake.getLength(); i++) {
 			if (i == 0 && snake.isFacingRight()) {
 				snake.setHeadFacingRight(new ImageIcon(assets("snake_head_right")));
@@ -87,6 +96,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
 		}
 		displayFruit(g);
+
+		for (int i = 1; i < snake.getLength(); i++) {
+			if (snake.getXLength()[i] == snake.getXLength()[0] && snake.getYLength()[i] == snake.getYLength()[0]) {
+					snake.resetFacing();
+
+					g.setColor(Color.RED);
+					g.setFont(new Font("areal", Font.BOLD, 40));
+					g.drawString("Game Over! Score: "+score, 250, 300);
+					
+					g.setColor(Color.WHITE);
+					g.setFont(new Font("areal", Font.BOLD, 40));
+					g.drawString("Press Enter to restart", 250, 340);
+			}
+		}
 
 		g.dispose();
 	}
@@ -129,8 +152,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	 * @param g
 	 */
 	private void displayTitle(Graphics g) {
-		titleImage = new ImageIcon(assets("snake_head"));
-		titleImage.paintIcon(this, g, gameXPos, 5);
+		int titleYPos = 10, titleHeight = 50;
+		g.setColor(Color.GREEN);
+		g.fillRect(gameXPos, titleYPos, gameWidth, titleHeight);
+
+		//titleImage = new ImageIcon(assets("snake_head"));
+		//titleImage.paintIcon(this, g, gameXPos, 5);
 	}
 
 	private String assets(String assetName) {
@@ -220,13 +247,17 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	public void keyTyped(KeyEvent e) { }
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			moves = 0;
+			score = 0;
+			snake.setLength(3);
+			repaint();
+		}
 
 		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			moves++;
